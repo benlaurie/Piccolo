@@ -342,6 +342,10 @@ typedef struct {
 `ifdef RVFI_DII
    UInt#(SEQ_LEN) instr_seq;
 `endif
+   RegName rs1;
+   RegName rs2;
+   CapPipe rs1_val;
+   CapPipe rs2_val;
    Op_Stage2  op_stage2;
    RegName    rd;
    Addr       addr;     // Branch, jump: newPC

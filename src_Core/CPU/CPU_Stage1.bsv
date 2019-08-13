@@ -304,6 +304,10 @@ module mkCPU_Stage1 #(Bit #(4)         verbosity,
       , addr            : alu_outputs.addr
       , mem_width_code  : alu_outputs.mem_width_code
       , mem_unsigned    : alu_outputs.mem_unsigned
+      , rs1: rs1
+      , rs2: rs2
+      , rs1_val: rs1_val
+      , rs2_val: rs2_val
 `ifdef ISA_CHERI
       , mem_allow_cap   : alu_outputs.mem_allow_cap
       , val1            : alu_outputs.val1_cap_not_int ? alu_outputs.cap_val1 : nullWithAddr(alu_outputs.val1)
