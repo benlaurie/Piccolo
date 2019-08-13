@@ -548,6 +548,8 @@ module mkMMU_Cache  #(parameter Bool dmem_not_imem,
                        Wd_AR_User, Wd_R_User)
                        master_xactor <- mkAXI4_Master_Xactor;
 
+   let slave_dbg = debugAXI4_Slave(master_xactor.slave, $format("CACHE"));
+
 `ifdef ISA_PRIV_S
    // The TLB
    TLB_IFC  tlb <- mkTLB (dmem_not_imem);
@@ -778,7 +780,7 @@ module mkMMU_Cache  #(parameter Bool dmem_not_imem,
 					    arregion: fabric_default_region,
 					    aruser:   fabric_default_aruser};
 
-	 master_xactor.slave.ar.put(mem_req_rd_addr);
+	 slave_dbg.ar.put(mem_req_rd_addr);
 
 	 // Debugging
 	 if (cfg_verbosity > 1) begin
@@ -807,7 +809,7 @@ module mkMMU_Cache  #(parameter Bool dmem_not_imem,
 					    arregion: fabric_default_region,
 					    aruser:   fabric_default_aruser};
 
-	 master_xactor.slave.ar.put(mem_req_rd_addr);
+	 slave_dbg.ar.put(mem_req_rd_addr);
 
 	 // Debugging
 	 if (cfg_verbosity > 1) begin
@@ -850,8 +852,8 @@ module mkMMU_Cache  #(parameter Bool dmem_not_imem,
 					   wlast:  True,
 					   wuser:  fabric_wuser};
 
-	 master_xactor.slave.aw.put(mem_req_wr_addr);
-	 master_xactor.slave.w.put(mem_req_wr_data);
+	 slave_dbg.aw.put(mem_req_wr_addr);
+	 slave_dbg.w.put(mem_req_wr_data);
 
 	 // Expect a fabric response
 	 ctr_wr_rsps_pending.incr;
@@ -1299,7 +1301,7 @@ module mkMMU_Cache  #(parameter Bool dmem_not_imem,
    //TODO change the widths in this
    rule rl_ptw_level_2 (rg_state == PTW_LEVEL_2);
       // Memory read-response is a level 1 PTE
-      let mem_rsp <- get(master_xactor.slave.r);
+      let mem_rsp <- get(slave_dbg.r);
 
       Bit #(64) x64 = zeroExtend (mem_rsp.rdata);
       WordXL pte;
@@ -1386,7 +1388,7 @@ module mkMMU_Cache  #(parameter Bool dmem_not_imem,
 
    rule rl_ptw_level_1 (rg_state == PTW_LEVEL_1);
       // Memory read-response is a level 1 PTE
-      let mem_rsp <- get(master_xactor.slave.r);
+      let mem_rsp <- get(slave_dbg.r);
 
       Bit #(64) x64 = zeroExtend (mem_rsp.rdata);
       WordXL pte;
@@ -1484,7 +1486,7 @@ module mkMMU_Cache  #(parameter Bool dmem_not_imem,
 
    rule rl_ptw_level_0 (rg_state == PTW_LEVEL_0);
       // Memory read-response is a level 0 PTE
-      let mem_rsp <- get(master_xactor.slave.r);
+      let mem_rsp <- get(slave_dbg.r);
 
       Bit #(64) x64 = zeroExtend (mem_rsp.rdata);
       WordXL pte;
@@ -1647,7 +1649,7 @@ module mkMMU_Cache  #(parameter Bool dmem_not_imem,
    //         (for set read-modify-write; not relevant for direct-mapped)
 
    rule rl_cache_refill_rsps_loop (!req_called && !resetting && rg_state == CACHE_REFILL);
-      let mem_rsp <- get(master_xactor.slave.r);
+      let mem_rsp <- get(slave_dbg.r);
       if (cfg_verbosity > 2) begin
 	 $display ("%0d: %s.rl_cache_refill_rsps_loop:", cur_cycle, d_or_i);
 	 $display ("        ", fshow (mem_rsp));
@@ -1774,7 +1776,7 @@ module mkMMU_Cache  #(parameter Bool dmem_not_imem,
 
    rule rl_io_read_rsp (!resetting && (rg_state == IO_AWAITING_READ_RSP));
 
-      let rd_data <- get(master_xactor.slave.r);
+      let rd_data <- get(slave_dbg.r);
       if (cfg_verbosity > 1) begin
 	 $display ("%0d: %s.rl_io_read_rsp: vaddr 0x%0h  paddr 0x%0h", cur_cycle, d_or_i, rg_addr, rg_pa);
 	 $display ("    ", fshow (rd_data));
@@ -1876,7 +1878,7 @@ module mkMMU_Cache  #(parameter Bool dmem_not_imem,
 `endif
 
    rule rl_io_AMO_read_rsp (!resetting && rg_state == IO_AWAITING_AMO_READ_RSP);
-      let rd_data <- get(master_xactor.slave.r);
+      let rd_data <- get(slave_dbg.r);
       if (cfg_verbosity > 1) begin
 	 $display ("%0d: %s.rl_io_AMO_read_rsp: vaddr 0x%0h  paddr 0x%0h", cur_cycle, d_or_i, rg_addr, rg_pa);
 	 $display ("    ", fshow (rd_data));
@@ -1920,7 +1922,7 @@ module mkMMU_Cache  #(parameter Bool dmem_not_imem,
    // NOTE: assuming in-order responses from fabric
 
    rule rl_discard_write_rsp;
-      let wr_resp <- get(master_xactor.slave.b);
+      let wr_resp <- get(slave_dbg.b);
 
       if (ctr_wr_rsps_pending.value == 0) begin
 	 $display ("%0d: ERROR: %s.rl_discard_write_rsp: unexpected W response (ctr_wr_rsps_pending.value == 0)",

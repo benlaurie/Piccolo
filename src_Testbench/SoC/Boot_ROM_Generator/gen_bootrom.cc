@@ -157,7 +157,7 @@ void make_dtb(int xlen, char *isa_string)
 {
   const int reset_vec_size = 8;
 
-  uint64_t start_pc = DMEM_BASE;
+  uint64_t start_pc = 0xc0000000;
 
   uint32_t reset_vec[reset_vec_size] = {
     0x297,                                      // auipc  t0,0x0

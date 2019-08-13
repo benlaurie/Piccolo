@@ -468,6 +468,22 @@ module mkCPU (CPU_IFC);
       $display ("----------------");
    endrule
 
+   (* no_implicit_conditions, fire_when_enabled *)
+   rule rl_show_pipe2 (stage1.out.ostatus != OSTATUS_EMPTY && stage1.out.ostatus != OSTATUS_BUSY
+		      && fn_is_running (rg_state)
+		      && (rg_state != CPU_WFI_PAUSED));
+      $display("-----------------Stage 1 stuff--------------------");
+      $display("pcc: ", fshow(stage1.out.data_to_stage2.pcc));
+      $display("ddc: ", fshow(stage1.out.data_to_stage2.ddc));
+      $display("instr: ", fshow(stage1.out.data_to_stage2.instr));
+      $display("rs1: ", fshow(stage1.out.data_to_stage2.rs1), " read: ", fshow(stage1.out.data_to_stage2.rs1_val));
+      $display("rs2: ", fshow(stage1.out.data_to_stage2.rs2), " read: ", fshow(stage1.out.data_to_stage2.rs2_val));
+      $display("val1: ", fshow(stage1.out.data_to_stage2.val1));
+      $display("val2: ", fshow(stage1.out.data_to_stage2.val2));
+      $display("check_enable: ", fshow(stage1.out.data_to_stage2.check_enable), " check_authority: ", fshow(stage1.out.data_to_stage2.check_authority));
+      $display("-------------end-Stage 1 stuff--------------------");
+   endrule
+
    // ================================================================
    // Reset
 
@@ -2181,8 +2197,13 @@ module mkCPU (CPU_IFC);
       if (csr_addr == csr_addr_mhpmevent31) begin
         csr_addr = csr_addr_mccsr;
       end
-      let m_data = csr_regfile.read_csr_port2 (csr_addr);
-      let data = fromMaybe (?, m_data);
+      let data = ?;
+      if (csr_addr == csr_addr_mhpmevent30) begin
+        data = 32'h05050505;
+      end else begin
+        let m_data = csr_regfile.read_csr_port2 (csr_addr);
+        data = fromMaybe (?, m_data);
+      end
       let rsp = DM_CPU_Rsp {ok: True, data: data};
       f_csr_rsps.enq (rsp);
       if (cur_verbosity > 1)

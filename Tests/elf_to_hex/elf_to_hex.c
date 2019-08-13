@@ -20,7 +20,7 @@
 
 // 1 Gigabyte size
 // #define MAX_MEM_SIZE (((uint64_t) 0x400) * ((uint64_t) 0x400) * ((uint64_t) 0x400))
-#define MAX_MEM_SIZE ((uint64_t) 0x90000000)
+#define MAX_MEM_SIZE ((uint64_t) 0xffffffff)
 
 uint8_t mem_buf [MAX_MEM_SIZE];
 
@@ -251,7 +251,7 @@ void c_mem_load_elf (char *elf_filename,
 
 // For 256 MB memory at 0x_8000_0000
 #define MIN_MEM_ADDR_256MB  BASE_ADDR_B
-#define MAX_MEM_ADDR_256MB  (BASE_ADDR_B + 0x10000000lu)
+#define MAX_MEM_ADDR_256MB  (BASE_ADDR_B + 0x7ffffffflu)
 
 // ================================================================
 

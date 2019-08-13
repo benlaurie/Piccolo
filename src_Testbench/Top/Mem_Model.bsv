@@ -48,7 +48,7 @@ interface Mem_Model_IFC;
    interface  MemoryServer #(Bits_per_Raw_Mem_Addr, Bits_per_Raw_Mem_Word)  mem_server;
 endinterface
 
-typedef 'h4000_0000 Bytes_Per_Mem;
+typedef 'h8000_0000 Bytes_Per_Mem;
 
 // ================================================================
 // Mem Model implementation

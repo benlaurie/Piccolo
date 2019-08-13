@@ -177,8 +177,12 @@ module mkSoC_Top (SoC_Top_IFC);
    // CPU IMem master to fabric
    master_vector[imem_master_num] = core.cpu_imem_master;
 
+   let nosynth_cpu_dmem_master <- fromAXI4_Master_Synth(core.cpu_dmem_master);
+   let dbg_cpu_dmem_master = nosynth_cpu_dmem_master;
+   let synth_dbg_cpu_dmem_master = toAXI4_Master_Synth(dbg_cpu_dmem_master);
+
    // CPU DMem master to fabric
-   master_vector[dmem_master_num] = core.cpu_dmem_master;
+   master_vector[dmem_master_num] = synth_dbg_cpu_dmem_master;
 
 `ifdef INCLUDE_ACCEL0
    // accel_aes0 to fabric
@@ -211,7 +215,7 @@ module mkSoC_Top (SoC_Top_IFC);
    // Fabric to UART0
    let uart0_slave <- fromAXI4_Slave_Synth(uart0.slave);
    slave_vector[uart0_slave_num] = toAXI4_Slave_Synth(zeroSlaveUserFields(uart0_slave));
-   route_vector[uart0_slave_num] = soc_map.m_uart0_addr_range;
+   route_vector[uart0_slave_num] = soc_map.m_uart16550_0_addr_range;
 
 `ifdef INCLUDE_ACCEL0
    // Fabric to accel_aes0
@@ -240,7 +244,7 @@ module mkSoC_Top (SoC_Top_IFC);
       Bool intr = uart0.intr;
 
       // UART
-      core.core_external_interrupt_sources [irq_num_uart0].m_interrupt_req (intr);
+      core.core_external_interrupt_sources [irq_num_uart16550_0].m_interrupt_req (intr);
 
       // Tie off remaining interrupt request lines (1..N)
       for (Integer j = 1; j < valueOf (N_External_Interrupt_Sources); j = j + 1)
@@ -285,8 +289,8 @@ module mkSoC_Top (SoC_Top_IFC);
 	 mem0_controller.set_addr_map (rangeBase(soc_map.m_mem0_controller_addr_range),
 				       rangeTop(soc_map.m_mem0_controller_addr_range));
 
-	 uart0.set_addr_map (rangeBase(soc_map.m_uart0_addr_range),
-                             rangeTop(soc_map.m_uart0_addr_range));
+	 uart0.set_addr_map (rangeBase(soc_map.m_uart16550_0_addr_range),
+                             rangeTop(soc_map.m_uart16550_0_addr_range));
 
 	 if (verbosity != 0) begin
 	    $display ("  SoC address map:");
@@ -297,8 +301,8 @@ module mkSoC_Top (SoC_Top_IFC);
 		      rangeBase(soc_map.m_mem0_controller_addr_range),
 		      rangeTop(soc_map.m_mem0_controller_addr_range));
 	    $display ("  UART0:           0x%0h .. 0x%0h",
-		      rangeBase(soc_map.m_uart0_addr_range),
-		      rangeTop(soc_map.m_uart0_addr_range));
+		      rangeBase(soc_map.m_uart16550_0_addr_range),
+		      rangeTop(soc_map.m_uart16550_0_addr_range));
 	 end
       endaction
    endfunction
