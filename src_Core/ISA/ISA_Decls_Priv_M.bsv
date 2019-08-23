@@ -183,7 +183,7 @@ CSR_Addr   csr_addr_dscratch0 = 12'h7B2;    // Debug scratch0
 CSR_Addr   csr_addr_dscratch1 = 12'h7B3;    // Debug scratch1
 
 `ifdef ISA_CHERI
-CSR_Addr   csr_addr_mccsr     = 12'h8C0;    // Machine Capability Control and Status
+CSR_Addr   csr_addr_mccsr     = 12'hBC0;    // Machine Capability Control and Status
 `endif
 
 // ================================================================
@@ -467,7 +467,11 @@ endfunction
 
 function MTVec word_to_mtvec (WordXL x);
    return MTVec {base: truncate (x >> 2),
+`ifdef RVFI_DII
+                 mode: unpack (x[1] == 1 ? 0 : x[0])};
+`else
                  mode: unpack (x[0])};
+`endif
 endfunction
 
 // ================================================================

@@ -2276,6 +2276,13 @@ module mkCPU (CPU_IFC);
       csr_regfile.nmi_req (x);
    endmethod
 
+
+`ifdef DETERMINISTIC_TIMING
+   method Bit#(64) take_minstret;
+      return csr_regfile.read_csr_minstret;
+   endmethod
+`endif
+
    // ----------------
    // For tracing
 
