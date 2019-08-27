@@ -194,7 +194,7 @@ instance PCC#(CapPipe);
             toRet = Valid(exc_code_CHERI_Seal);
         else if (!getHardPerms(pcc).permitExecute)
             toRet = Valid(exc_code_CHERI_XPerm);
-        else if (zeroExtend(getAddr(pcc)) + (is_i32_not_i16 ? 4 : 2) >= top)
+        else if (zeroExtend(getAddr(pcc)) + (is_i32_not_i16 ? 4 : 2) > top)
             toRet = Valid(exc_code_CHERI_Length);
         return toRet;
     endfunction
@@ -235,6 +235,7 @@ typedef enum {  CONTROL_STRAIGHT
 	      , CONTROL_BRANCH
 	      , CONTROL_CSRR_W
 `ifdef ISA_CHERI
+        , CONTROL_CAPBRANCH
 	      , CONTROL_SCR_W
 `endif
 	      , CONTROL_CSRR_S_or_C
