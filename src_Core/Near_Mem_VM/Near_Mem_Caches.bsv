@@ -163,7 +163,7 @@ module mkNear_Mem (Near_Mem_IFC);
       method WordXL   tval           = icache.addr;
 
 `ifdef PERFORMANCE_MONITORING
-      method EventsCache cacheEvents = icache.cacheEvents;
+      method EventsCache events = icache.events;
 `endif
    endinterface
 
@@ -205,7 +205,7 @@ module mkNear_Mem (Near_Mem_IFC);
       method Exc_Code   exc_code   = dcache.exc_code;
 
 `ifdef PERFORMANCE_MONITORING
-      method EventsCache cacheEvents = dcache.cacheEvents;
+      method EventsCache events = dcache.events;
 `endif
    endinterface
 

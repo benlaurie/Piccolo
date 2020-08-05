@@ -70,6 +70,10 @@ import TV_Taps :: *;
 `endif
 `endif
 
+`ifdef PERFORMANCE_MONITORING
+import PerformanceMonitor :: *;
+`endif
+
 // ================================================================
 // The Core module
 
@@ -343,6 +347,15 @@ module mkCore (Core_IFC #(N_External_Interrupt_Sources));
 
       // $display ("%0d: Core.rl_relay_external_interrupts: relaying: %d", cur_cycle, pack (x));
    endrule
+
+   // ================================================================
+   // Connect performance events from axi4_dmem_shim to CPU
+
+`ifdef PERFORMANCE_MONITORING
+   rule rl_relay_external_events;    // from Tag Cache
+      cpu.relay_external_events (to_vector (axi4_dmem_shim.events));
+   endrule
+`endif
 
    // ================================================================
    // INTERFACE
