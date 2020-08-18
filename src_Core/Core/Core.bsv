@@ -352,8 +352,12 @@ module mkCore (Core_IFC #(N_External_Interrupt_Sources));
    // Connect performance events from axi4_dmem_shim to CPU
 
 `ifdef PERFORMANCE_MONITORING
-   rule rl_relay_external_events;    // from Tag Cache
-      cpu.relay_external_events (to_vector (axi4_dmem_shim.events));
+   rule rl_relay_external_events;
+      // TODO: Get tag cache master events from outside
+      let master_events = to_vector (axi4_dmem_shim_master_perf.events);
+      let slave_events = to_vector (axi4_dmem_shim_slave_perf.events);
+      let events = append (tag_cache_evts, append (slave_events, master_events));
+      cpu.relay_external_events (to_large_vector (events));
    endrule
 `endif
 
