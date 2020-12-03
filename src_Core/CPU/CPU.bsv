@@ -913,10 +913,6 @@ module mkCPU (CPU_IFC);
 
       fa_emit_instr_trace (minstret, epc, instr, rg_cur_priv);
 
-`ifdef PERFORMANCE_MONITORING
-      fa_gather_instr_event (instr, rg_cur_priv, 3);
-`endif
-
       // Debug
       if (cur_verbosity != 0)
 	 $display ("    mcause:0x%0h  epc 0x%0h  tval:0x%0h  next_pc 0x%0h, new_priv %0d new_mstatus 0x%0h",
