@@ -300,8 +300,8 @@ deriving (Eq, Bits, FShow);
 
 `ifdef PERFORMANCE_MONITORING
 (* synthesize *)
-module mkPerfCountersPiccolo (PerfCounters_IFC #(No_Of_Ctrs, Counter_Width, No_Of_Evts));
-  PerfCounters_IFC #(No_Of_Ctrs, Counter_Width, No_Of_Evts) perf_counters <- mkPerfCounters;
+module mkPerfCountersPiccolo (PerfCounters_IFC #(No_Of_Ctrs, Counter_Width, Counter_Width, No_Of_Evts));
+  PerfCounters_IFC #(No_Of_Ctrs, Counter_Width, Counter_Width, No_Of_Evts) perf_counters <- mkPerfCounters;
   return perf_counters;
 endmodule
 `endif
@@ -386,7 +386,7 @@ module mkCSR_RegFile (CSR_RegFile_IFC);
    PulseWire          pw_minstret_incr <- mkPulseWire;
 
 `ifdef PERFORMANCE_MONITORING
-   PerfCounters_IFC #(No_Of_Ctrs, Counter_Width, No_Of_Evts) perf_counters <- mkPerfCountersPiccolo;
+   PerfCounters_IFC #(No_Of_Ctrs, Counter_Width, Counter_Width, No_Of_Evts) perf_counters <- mkPerfCountersPiccolo;
    Vector #(No_Of_Ctrs, ReadOnly #(Bit #(Counter_Width))) ctrs = perf_counters.read_counters;
    let ctr_sels = perf_counters.read_ctr_sels;
 
