@@ -752,17 +752,6 @@ module mkCPU (CPU_IFC);
 	 begin
 	    stage2.enq (stage1.out.data_to_stage2);  stage2_full = True;
 	    stage1.deq;                              stage1_full = False;
-`ifdef PERFORMANCE_MONITORING
-            if (   (stage1.out.data_to_stage2.op_stage2 == OP_Stage2_ST)
-                && (stage1.out.data_to_stage2.mem_width_code == w_SIZE_CAP)   ) begin
-              events.evt_MEM_CAP_STORE = True;
-              CapReg capReg = cast (extract_cap (stage1.out.data_to_stage2.val2));
-              CapMem capMem = cast (capReg);
-              events.evt_MEM_CAP_STORE_TAG_SET = isValidCap (capMem);
-            end
-	    events.evt_IMPRECISE_SETBOUND =  ! stage1.out.data_to_stage2.check_exact_success;
-	    events.evt_UNREPRESENTABLE_CAP = ! stage1.out.data_to_stage2.set_offset_in_bounds;
-`endif
 	 end
 
       // ----------------

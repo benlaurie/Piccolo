@@ -100,6 +100,7 @@ module mkCPU_Stage2 #(Bit #(4)         verbosity,
    Reg #(Bool)                  rg_resetting  <- mkReg (False);
    Reg #(Bool)                  rg_full       <- mkReg (False);
    Reg #(Data_Stage1_to_Stage2) rg_stage2     <- mkRegU;    // From Stage 1
+   Reg #(Bit#(5))               rg_f5         <- mkReg (0);
 
    // ----------------
    // Serial shifter box
@@ -344,17 +345,8 @@ module mkCPU_Stage2 #(Bit #(4)         verbosity,
 	 Output_Stage2_Perf perf = unpack (0);
 `ifdef ISA_A
 	 if (   (rg_stage2.op_stage2 == OP_Stage2_AMO) && (rg_f5 == f5_AMO_SC)   )
-`ifdef ISA_CHERI
-	    perf.sc_success = (getAddr (result) == 0);
-`else
 	    perf.sc_success = (result == 0);
-`endif
 `endif // ISA_A
-`ifdef ISA_CHERI
-	 perf.ld_cap = (rg_stage2.mem_width_code == w_SIZE_CAP);
-	 // TODO_P: Should 'rg_stage2.mem_allow_cap' also be set?
-	 perf.ld_cap_tag_set = (rg_stage2.mem_width_code == w_SIZE_CAP) && mem_tag && rg_stage2.mem_allow_cap;
-`endif
 	 perf.ld_wait = (! dcache.valid);
 `endif
 
@@ -563,6 +555,7 @@ module mkCPU_Stage2 #(Bit #(4)         verbosity,
 	 Bool op_stage2_amo = False;
 	 Bit #(7) amo_funct7 = 0;
 `endif
+	 rg_f5 <= pack(x.val1) [6:2];
 	 if ((x.op_stage2 == OP_Stage2_LD) || (x.op_stage2 == OP_Stage2_ST) || op_stage2_amo) begin
 	    WordXL   mstatus     = csr_regfile.read_mstatus;
 `ifdef ISA_PRIV_S
